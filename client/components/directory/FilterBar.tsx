@@ -1,10 +1,11 @@
 import { useFilterStore } from '../../stores/index.ts'
-import { useCategories } from '../../hooks/useApi.ts'
-import { COUNTRIES, COUNTRY_NAMES, AUTH_TYPES, PRICING_TIERS } from '../../services/api.ts'
+import { useCategories, useCountries } from '../../hooks/useApi.ts'
+import { countryFlag, COUNTRY_NAMES, AUTH_TYPES, PRICING_TIERS } from '../../services/api.ts'
 
 export function FilterBar() {
   const { category, country, auth, pricing, free, noAuth, working, testable, setFilter, resetFilters } = useFilterStore()
   const { data: catData } = useCategories()
+  const { data: countriesData } = useCountries()
   const hasFilters = category || country || auth || pricing || free || noAuth
 
   const selectClass =
@@ -30,8 +31,10 @@ export function FilterBar() {
           className={selectClass}
         >
           <option value="">All Countries</option>
-          {COUNTRIES.map(c => (
-            <option key={c} value={c}>{COUNTRY_NAMES[c]}</option>
+          {(countriesData?.countries ?? []).map(c => (
+            <option key={c} value={c}>
+              {c === 'global' ? '\uD83C\uDF10 ' : `${countryFlag(c)} `}{COUNTRY_NAMES[c] || c}
+            </option>
           ))}
         </select>
 

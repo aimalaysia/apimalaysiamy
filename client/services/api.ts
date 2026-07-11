@@ -39,6 +39,10 @@ export function fetchApiById(id: string): Promise<ApiEntry> {
   return fetchJson(`${BASE_URL}/apis/${id}`)
 }
 
+export function fetchCountries(): Promise<{ count: number; countries: string[] }> {
+  return fetchJson(`${BASE_URL}/countries`)
+}
+
 export function submitApi(payload: SubmissionPayload): Promise<{ success: boolean; id: number; message: string }> {
   return fetch(`${BASE_URL}/submit`, {
     method: 'POST',
@@ -47,10 +51,20 @@ export function submitApi(payload: SubmissionPayload): Promise<{ success: boolea
   }).then(r => r.json())
 }
 
-export const COUNTRIES = ['MY', 'SG', 'ID', 'TH'] as const
+export function countryFlag(code: string): string {
+  return [...code.toUpperCase()].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('')
+}
+
 export const COUNTRY_NAMES: Record<string, string> = {
   MY: 'Malaysia', SG: 'Singapore', ID: 'Indonesia', TH: 'Thailand',
+  VN: 'Vietnam', PH: 'Philippines', MM: 'Myanmar', BN: 'Brunei',
+  LA: 'Laos', KH: 'Cambodia', TL: 'East Timor',
+  AU: 'Australia', NZ: 'New Zealand', IN: 'India', CN: 'China',
+  JP: 'Japan', KR: 'South Korea', US: 'United States', GB: 'United Kingdom',
+  DE: 'Germany', FR: 'France', NL: 'Netherlands', SG: 'Singapore',
+  global: 'Global',
 }
+export const COUNTRIES = Object.keys(COUNTRY_NAMES).filter(c => c !== 'global').sort()
 
 export const AUTH_TYPES = ['none', 'apiKey', 'oauth', 'bearer', 'token', 'basic'] as const
 export const PRICING_TIERS = ['free', 'freemium', 'paid'] as const

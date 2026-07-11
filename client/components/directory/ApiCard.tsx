@@ -1,5 +1,6 @@
 import type { ApiEntry } from '../../types/index.ts'
 import { useFavoritesStore } from '../../stores/index.ts'
+import { countryFlag, COUNTRY_NAMES } from '../../services/api.ts'
 
 const tierStyles: Record<string, { label: string; classes: string }> = {
   open: { label: 'Open', classes: 'bg-emerald-900/40 text-emerald-300 border-emerald-800/50' },
@@ -95,8 +96,8 @@ export function ApiCard({ api, onSelect }: Props) {
           </span>
         )}
         {countries.map(c => (
-          <span key={c} className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#1e2440] text-zinc-500 font-mono border border-[#2e3460]">
-            {c}
+          <span key={c} className="inline-flex items-center gap-1 text-xs px-1 py-0.5 rounded-md bg-[#1e2440] border border-[#2e3460]" title={COUNTRY_NAMES[c] || c}>
+            <span className="text-sm leading-none">{c === 'global' ? '\uD83C\uDF10' : countryFlag(c)}</span>
           </span>
         ))}
       </div>

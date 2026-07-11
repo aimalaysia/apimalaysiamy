@@ -7,6 +7,7 @@ import { searchRoute } from './routes/search.ts'
 import { categoriesRoute } from './routes/categories.ts'
 import { apisRoute } from './routes/apis.ts'
 import { submitRoute } from './routes/submit.ts'
+import { countriesRoute } from './routes/countries.ts'
 
 const app = new Hono()
 
@@ -20,12 +21,13 @@ app.route('/api/search', searchRoute)
 app.route('/api/categories', categoriesRoute)
 app.route('/api/apis', apisRoute)
 app.route('/api', submitRoute)
+app.route('/api/countries', countriesRoute)
 
 app.get('/api', (c) => c.json({
   name: 'MyAPI',
   description: 'MyAPI — Every API in Southeast Asia. Government open data + curated commercial APIs.',
   count: 0,
-  endpoints: ['/api/catalogue', '/api/search?q=', '/api/categories', '/api/apis/:id'],
+  endpoints: ['/api/catalogue', '/api/search?q=', '/api/categories', '/api/countries', '/api/apis/:id'],
   mcp: '/mcp',
 }))
 

@@ -26,6 +26,14 @@ export function useCategories() {
   })
 }
 
+export function useCountries() {
+  return useQuery({
+    queryKey: ['countries'],
+    queryFn: fetchCountries,
+    staleTime: 1000 * 60 * 15,
+  })
+}
+
 export function useApiDetail(id: string | undefined) {
   return useQuery({
     queryKey: ['api', id],

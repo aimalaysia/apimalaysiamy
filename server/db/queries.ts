@@ -36,10 +36,10 @@ export function searchApis(params: SearchParams) {
   if (category) conditions.push(eq(apis.category, category))
   if (country) conditions.push(like(apis.countries, `%${country}%`))
   if (tier) conditions.push(eq(apis.tier, tier))
-  if (auth) conditions.push(eq(apis.auth, auth))
-  if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (free === 'true') conditions.push(eq(apis.pricing, 'free'))
+  else if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (noAuth === 'true') conditions.push(eq(apis.auth, 'none'))
+  else if (auth) conditions.push(eq(apis.auth, auth))
   if (working === 'true') conditions.push(isNotNull(apis.verifiedAt))
   if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
@@ -70,10 +70,10 @@ export function countApis(params: SearchParams) {
   if (category) conditions.push(eq(apis.category, category))
   if (country) conditions.push(like(apis.countries, `%${country}%`))
   if (tier) conditions.push(eq(apis.tier, tier))
-  if (auth) conditions.push(eq(apis.auth, auth))
-  if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (free === 'true') conditions.push(eq(apis.pricing, 'free'))
+  else if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (noAuth === 'true') conditions.push(eq(apis.auth, 'none'))
+  else if (auth) conditions.push(eq(apis.auth, auth))
   if (working === 'true') conditions.push(isNotNull(apis.verifiedAt))
   if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
@@ -88,6 +88,18 @@ export function getApiById(id: string) {
 
 export function getApiBySlug(slug: string) {
   return db.select().from(apis).where(eq(apis.slug, slug)).get()
+}
+
+export function getAllCountries(): string[] {
+  const rows = db.select({ countries: apis.countries }).from(apis).all()
+  const set = new Set<string>()
+  for (const row of rows) {
+    try {
+      const list: string[] = JSON.parse(row.countries)
+      for (const c of list) set.add(c)
+    } catch { /* skip malformed */ }
+  }
+  return [...set].sort()
 }
 
 export function getAllCategories() {

@@ -23,9 +23,8 @@ export function DirectoryPage() {
             </h1>
           </div>
         </div>
-        <p className="text-zinc-400 text-sm sm:text-base max-w-2xl">
-          Discover and test APIs from across Southeast Asia — Malaysia, Singapore, Indonesia & Thailand.
-          Every API you need to build regionally.
+        <p className="text-zinc-400 text-sm sm:text-base max-w-3xl leading-relaxed">
+          Discover, explore, and test APIs from across Southeast Asia, including Malaysia, Singapore, Indonesia, Thailand, and other neighbouring countries. Access a curated collection of reliable, testable APIs for education, research, rapid prototyping, and regional application development. This platform is intended for <span className="text-zinc-300">educational and learning purposes only</span>, helping developers understand, evaluate, and integrate APIs from the Southeast Asian ecosystem.
         </p>
       </div>
       <ApiCardGrid onSelect={handleSelect} />
