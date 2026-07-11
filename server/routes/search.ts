@@ -12,11 +12,13 @@ searchRoute.get('/', (c) => {
   const pricing = c.req.query('pricing') || undefined
   const free = c.req.query('free') || undefined
   const noAuth = c.req.query('no_auth') || undefined
+  const working = c.req.query('working') || undefined
+  const testable = c.req.query('testable') || undefined
   const limit = parseInt(c.req.query('limit') || '50')
   const offset = parseInt(c.req.query('offset') || '0')
 
-  const apis = searchApis({ q, category, country, tier, auth, pricing, free, noAuth, limit, offset })
-  const count = countApis({ q, category, country, tier, auth, pricing, free, noAuth })
+  const apis = searchApis({ q, category, country, tier, auth, pricing, free, noAuth, working, testable, limit, offset })
+  const count = countApis({ q, category, country, tier, auth, pricing, free, noAuth, working, testable })
 
   return c.json({ query: q || '', count, apis })
 })

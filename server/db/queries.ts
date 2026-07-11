@@ -1,6 +1,6 @@
 import { db, sqlite } from './connection.ts'
 import { apis, categories, submissions } from './schema.ts'
-import { like, or, eq, and, SQL, asc } from 'drizzle-orm'
+import { like, or, eq, and, isNotNull, SQL, asc } from 'drizzle-orm'
 
 export interface SearchParams {
   q?: string
@@ -11,13 +11,15 @@ export interface SearchParams {
   pricing?: string
   free?: string
   noAuth?: string
+  working?: string
+  testable?: string
   limit?: number
   offset?: number
 }
 
 export function searchApis(params: SearchParams) {
   const conditions: SQL[] = []
-  const { q, category, country, tier, auth, pricing, free, noAuth } = params
+  const { q, category, country, tier, auth, pricing, free, noAuth, working, testable } = params
 
   if (q) {
     const term = `%${q}%`
@@ -38,6 +40,8 @@ export function searchApis(params: SearchParams) {
   if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (free === 'true') conditions.push(eq(apis.pricing, 'free'))
   if (noAuth === 'true') conditions.push(eq(apis.auth, 'none'))
+  if (working === 'true') conditions.push(apis.verifiedAt.isNotNull())
+  if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
   const where = conditions.length > 0 ? and(...conditions) : undefined
 
@@ -49,7 +53,7 @@ export function searchApis(params: SearchParams) {
 
 export function countApis(params: SearchParams) {
   const conditions: SQL[] = []
-  const { q, category, country, tier, auth, pricing, free, noAuth } = params
+  const { q, category, country, tier, auth, pricing, free, noAuth, working, testable } = params
 
   if (q) {
     const term = `%${q}%`
@@ -70,6 +74,8 @@ export function countApis(params: SearchParams) {
   if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (free === 'true') conditions.push(eq(apis.pricing, 'free'))
   if (noAuth === 'true') conditions.push(eq(apis.auth, 'none'))
+  if (working === 'true') conditions.push(apis.verifiedAt.isNotNull())
+  if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
   const where = conditions.length > 0 ? and(...conditions) : undefined
   const result = db.select({ count: sqlite.raw('COUNT(*)') }).from(apis).where(where).get()

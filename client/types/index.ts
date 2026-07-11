@@ -20,6 +20,7 @@ export interface ApiEntry {
   coverage: string | null
   note: string | null
   attributes: string | null
+  verifiedAt: string | null
   createdAt: string
   updatedAt: string
 }
@@ -59,6 +60,8 @@ export interface SearchFilters {
   pricing?: string
   free?: string
   noAuth?: string
+  working?: string
+  testable?: string
   limit?: number
   offset?: number
 }

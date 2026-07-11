@@ -15,10 +15,13 @@ export const useFilterStore = create<FilterStore>((set) => ({
   pricing: undefined,
   free: undefined,
   noAuth: undefined,
+  working: 'true',
+  testable: 'true',
   setFilter: (key, value) => set({ [key]: value }),
   resetFilters: () => set({
     q: '', category: undefined, country: undefined, tier: undefined,
     auth: undefined, pricing: undefined, free: undefined, noAuth: undefined,
+    working: 'true', testable: 'true',
   }),
 }))
 

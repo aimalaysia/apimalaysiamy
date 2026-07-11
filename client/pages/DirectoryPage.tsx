@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { ApiEntry } from '../types/index.ts'
-import { ApiCardGrid } from '../../components/directory/ApiCardGrid.tsx'
-import { DetailPanel } from '../../components/detail/DetailPanel.tsx'
+import { ApiCardGrid } from '../components/directory/ApiCardGrid.tsx'
+import { DetailPanel } from '../components/detail/DetailPanel.tsx'
 
 export function DirectoryPage() {
   const [selected, setSelected] = useState<ApiEntry | null>(null)

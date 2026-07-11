@@ -22,6 +22,8 @@ export function searchApis(filters: SearchFilters): Promise<SearchResponse> {
   if (filters.pricing) params.set('pricing', filters.pricing)
   if (filters.free) params.set('free', filters.free)
   if (filters.noAuth) params.set('no_auth', filters.noAuth)
+  if (filters.working) params.set('working', filters.working)
+  if (filters.testable) params.set('testable', filters.testable)
   if (filters.limit) params.set('limit', String(filters.limit))
   if (filters.offset) params.set('offset', String(filters.offset))
 
