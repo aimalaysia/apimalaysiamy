@@ -1,6 +1,6 @@
-import { db, sqlite } from './connection.ts'
+import { db } from './connection.ts'
 import { apis, categories, submissions } from './schema.ts'
-import { like, or, eq, and, isNotNull, SQL, asc } from 'drizzle-orm'
+import { like, or, eq, and, isNotNull, SQL, asc, sql } from 'drizzle-orm'
 
 export interface SearchParams {
   q?: string
@@ -78,7 +78,7 @@ export function countApis(params: SearchParams) {
   if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
   const where = conditions.length > 0 ? and(...conditions) : undefined
-  const result = db.select({ count: sqlite.raw('COUNT(*)') }).from(apis).where(where).get()
+  const result = db.select({ count: sql<number>`COUNT(*)` }).from(apis).where(where).get()
   return Number(result?.count || 0)
 }
 
