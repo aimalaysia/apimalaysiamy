@@ -40,7 +40,7 @@ export function searchApis(params: SearchParams) {
   if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (free === 'true') conditions.push(eq(apis.pricing, 'free'))
   if (noAuth === 'true') conditions.push(eq(apis.auth, 'none'))
-  if (working === 'true') conditions.push(apis.verifiedAt.isNotNull())
+  if (working === 'true') conditions.push(isNotNull(apis.verifiedAt))
   if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
   const where = conditions.length > 0 ? and(...conditions) : undefined
@@ -74,7 +74,7 @@ export function countApis(params: SearchParams) {
   if (pricing) conditions.push(eq(apis.pricing, pricing))
   if (free === 'true') conditions.push(eq(apis.pricing, 'free'))
   if (noAuth === 'true') conditions.push(eq(apis.auth, 'none'))
-  if (working === 'true') conditions.push(apis.verifiedAt.isNotNull())
+  if (working === 'true') conditions.push(isNotNull(apis.verifiedAt))
   if (testable === 'true') conditions.push(eq(apis.copyable, true))
 
   const where = conditions.length > 0 ? and(...conditions) : undefined
