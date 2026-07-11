@@ -1,4 +1,5 @@
 import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { catalogueRoute } from './routes/catalogue.ts'
@@ -10,6 +11,9 @@ import { submitRoute } from './routes/submit.ts'
 const app = new Hono()
 
 app.use('/*', cors())
+
+app.use('/assets/*', serveStatic({ root: '../client/dist' }))
+app.use('/favicon.svg', serveStatic({ path: '../client/dist/favicon.svg' }))
 
 app.route('/api/catalogue', catalogueRoute)
 app.route('/api/search', searchRoute)
@@ -34,6 +38,8 @@ app.get('/mcp', (c) => c.json({
 }))
 
 app.get('/health', (c) => c.json({ status: 'ok' }))
+
+app.get('/*', serveStatic({ path: '../client/dist/index.html' }))
 
 const port = parseInt(process.env.PORT || '3001')
 
