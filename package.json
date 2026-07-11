@@ -2,7 +2,7 @@
   "name": "myapi",
   "private": true,
   "scripts": {
-    "build": "cd client && npm install && npm run build && cd ../server && npm install && npx drizzle-kit push && npm run seed",
+    "build": "cd client && npm install && npm run build && cd ../server && npm install && npm run seed",
     "start": "cd server && npm start"
   }
 }
