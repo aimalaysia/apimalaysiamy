@@ -1,6 +1,7 @@
 import { db, sqlite } from './connection.ts'
 import { apis, categories } from './schema.ts'
-import { eq } from 'drizzle-orm'
+import fs from 'fs'
+import path from 'path'
 
 sqlite.exec(`
   CREATE TABLE IF NOT EXISTS apis (
@@ -79,10 +80,10 @@ if (existing) {
   process.exit(0)
 }
 
-console.log('Fetching catalogue from PasarAPI...')
-const res = await fetch('https://pasarapi.xyz/api/catalogue')
-const pasarApis: any[] = await res.json()
-console.log(`Fetched ${pasarApis.length} APIs from PasarAPI`)
+const raw = fs.readFileSync(path.join(import.meta.dirname, 'pasar-raw.json'), 'utf-8')
+const wrapper: { apis: any[] } = JSON.parse(raw)
+const pasarApis = wrapper.apis
+console.log(`Loaded ${pasarApis.length} APIs from pasar-raw.json`)
 
 const catMap = new Map<string, { name: string; slug: string; groupName: string; icon: string; sortOrder: number }>()
 let sortOrder = 0
@@ -114,6 +115,7 @@ for (let i = 0; i < pasarApis.length; i += batchSize) {
 
   for (const p of batch) {
     const copyable = typeof p.copyable === 'boolean' ? (p.copyable ? 1 : 0) : 1
+    const countries = JSON.stringify(p.country || [])
     let verifiedAt: string | null = null
     if (p.lastVerified || (p.trust && p.trust.verified)) {
       verifiedAt = new Date().toISOString()
@@ -123,10 +125,10 @@ for (let i = 0; i < pasarApis.length; i += batchSize) {
       id: p.id,
       slug: p.slug,
       title: p.title,
-      description: p.note || (typeof p.description === 'string' ? p.description : null),
+      description: p.note || null,
       category: p.category || 'Uncategorized',
       group: p.group || 'Build',
-      countries: JSON.stringify(p.country || []),
+      countries,
       provider: p.provider || 'Unknown',
       source: p.source || null,
       source_url: p.sourceUrl || null,
