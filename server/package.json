@@ -8,6 +8,7 @@
     "start": "tsx index.ts",
     "build": "tsc",
     "seed": "tsx db/seed.ts",
+    "ingest": "tsx scripts/ingest.ts",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate"
   },
