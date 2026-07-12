@@ -79,7 +79,7 @@ if (existing) {
   process.exit(0)
 }
 
-console.log('Database empty — ingesting from PasarAPI catalogue...')
+console.log('Database empty — ingesting from upstream catalogue...')
 await ingest()
 console.log('Seed complete!')
 process.exit(0)

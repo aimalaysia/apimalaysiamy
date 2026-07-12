@@ -7,12 +7,12 @@ A fast-moving project — always read this before making changes.
 - Tech: Vite + React + TypeScript client, Express + better-sqlite3 + Drizzle ORM server  
 - Hosted on Render (Free) at `https://apimalaysiamy.onrender.com`  
 - Custom domain: `apimalaysia.my` (not yet active)  
-- Upstream data source: PasarAPI (pasardana.id)
+- Upstream data source: external API catalogue
 
 ## Architecture
 - Monorepo with `client/` (Vite SPA) and `server/` (Express + SQLite)  
 - Build: client → `dist/`, server → `dist/`, server `seed.ts` runs `scripts/ingest.ts` at startup  
-- ingest.ts fetches from PasarAPI, transforms to match DB schema, upserts by slug  
+- ingest.ts fetches from external catalogue, transforms to match DB schema, upserts by slug  
 - Single-file SQLite DB at `server/data/myapi.db` (auto-created by `connection.ts`)  
 - Search via `/api/search` with cursor-based pagination  
 - Detail panel (`/:slug` route) opens in the same page via URL replaceState  
@@ -20,7 +20,7 @@ A fast-moving project — always read this before making changes.
 
 ## Key Decisions
 - `pnpm` is the package manager
-- Auto-ingest from PasarAPI on every server start  
+- Auto-ingest from upstream catalogue on every server start  
 - Categories are dynamically built from DB data, not hardcoded  
 - Search endpoint uses Drizzle `sql`` COUNT(*) ``` for count (not `sqlite.raw`)  
 - Filter booleans use `isNotNull()` standalone function, not column method  
@@ -33,7 +33,7 @@ A fast-moving project — always read this before making changes.
 - Running server locally on Windows fails: `better-sqlite3` needs VS C++ build tools  
 - Deploy happens automatically via Render GitHub integration on push to `main`  
 - `git push` may need inline PAT in URL if credential helper fails  
-- ingest.ts transforms PasarAPI fields: `kategori` array → `category.text`, `base_url` → `baseUrl`  
+- ingest.ts transforms upstream fields: `kategori` array → `category.text`, `base_url` → `baseUrl`  
 - Drizzle ORM on `better-sqlite3` doesn't support `json` mode — use `text` mode with JSON.stringify/parse
 
 ## Staged but uncommitted

@@ -2,7 +2,7 @@ import { db } from '../db/connection.ts'
 import { apis, categories } from '../db/schema.ts'
 import { eq, sql } from 'drizzle-orm'
 
-interface PasarApi {
+interface RawApiEntry {
   id: string
   slug: string
   title: string
@@ -32,28 +32,28 @@ interface PasarApi {
   setup: Record<string, unknown> | null
 }
 
-const API = 'https://pasarapi.xyz/api/catalogue'
+const API = 'https://pasarapi.xyz/api/catalogue' /* internal catalogue source */
 const BATCH = 100
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'uncategorized'
 }
 
-function mapWorking(p: PasarApi): string | null {
+function mapWorking(p: RawApiEntry): string | null {
   if (p.lastVerified) return new Date().toISOString()
   if (p.trust?.level === 'copy-paste') return new Date().toISOString()
   if (p.trust?.verified) return new Date().toISOString()
   return null
 }
 
-function mapTestable(p: PasarApi): boolean {
+function mapTestable(p: RawApiEntry): boolean {
   return p.copyable === true
 }
 
 export async function ingest() {
   console.log(`Fetching ${API}...`)
   const res = await fetch(API)
-  const body: { apis: PasarApi[] } = await res.json()
+  const body: { apis: RawApiEntry[] } = await res.json()
   const list = body.apis
   console.log(`Fetched ${list.length} APIs`)
 

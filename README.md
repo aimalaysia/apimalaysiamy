@@ -44,12 +44,12 @@ myapi/
 ### Data Flow
 
 ```
-PasarAPI (catalogue) ──> ingest.ts ──> SQLite DB ──> Hono API ──> React SPA
+Upstream catalogue ──> ingest.ts ──> SQLite DB ──> Hono API ──> React SPA
                                         │
                                    Community submissions
 ```
 
-The ingestion pipeline (`server/scripts/ingest.ts`) fetches the PasarAPI catalogue, transforms entries to match the APIMalaysia.my schema, deduplicates by slug, and upserts into the local SQLite database. Categories are built dynamically from the data.
+The ingestion pipeline (`server/scripts/ingest.ts`) fetches an upstream API catalogue, transforms entries to match the APIMalaysia.my schema, deduplicates by slug, and upserts into the local SQLite database. Categories are built dynamically from the data.
 
 ### Categorisation System
 
