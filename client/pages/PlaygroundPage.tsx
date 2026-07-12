@@ -36,13 +36,29 @@ console.log(data);`
     setLoading(false)
   }
 
+  function proxyUrl(url: string): string {
+    return `/api/proxy?url=${encodeURIComponent(url)}&_t=${Date.now()}`
+  }
+
   const handleRun = async () => {
     setLoading(true)
     setResponse('// Running...')
     try {
-      const match = code.match(/fetch\s*\(\s*['"]([^'"]+)['"]/)
-      if (match) {
-        const url = match[1]
+      const lines = code.split('\n')
+      const rewritten = lines.map(line => {
+        const match = line.match(/fetch\s*\(\s*['"]([^'"]+)['"]/)
+        if (match) {
+          const originalUrl = match[1]
+          if (!originalUrl.startsWith('/api/')) {
+            return line.replace(match[1], proxyUrl(originalUrl))
+          }
+        }
+        return line
+      }).join('\n')
+
+      const fetchMatch = rewritten.match(/fetch\s*\(\s*['"]([^'"]+)['"]/)
+      if (fetchMatch) {
+        const url = fetchMatch[1]
         const res = await fetch(url)
         const text = await res.text()
         try {
@@ -137,7 +153,11 @@ console.log(data);`
           </li>
           <li className="flex items-start gap-2">
             <span className="text-amber-400/60 mt-0.5">•</span>
-            <span>CORS-restricted endpoints may not work from the browser playground</span>
+            <span>External URLs are automatically proxied through the server to avoid CORS issues</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-amber-400/60 mt-0.5">•</span>
+            <span>Add <code className="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">?url=</code> to <code className="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">/api/proxy</code> or just write a regular <code className="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">fetch()</code> — it will be auto-proxied</span>
           </li>
         </ul>
       </div>

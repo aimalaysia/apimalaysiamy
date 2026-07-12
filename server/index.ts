@@ -8,6 +8,8 @@ import { categoriesRoute } from './routes/categories.ts'
 import { apisRoute } from './routes/apis.ts'
 import { submitRoute } from './routes/submit.ts'
 import { countriesRoute } from './routes/countries.ts'
+import { proxyRoute } from './routes/proxy.ts'
+import { adminRoute } from './routes/admin.ts'
 import { seoRoute } from './routes/seo.ts'
 
 const app = new Hono()
@@ -23,12 +25,14 @@ app.route('/api/categories', categoriesRoute)
 app.route('/api/apis', apisRoute)
 app.route('/api', submitRoute)
 app.route('/api/countries', countriesRoute)
+app.route('/api/proxy', proxyRoute)
+app.route('/api/admin', adminRoute)
 
 app.get('/api', (c) => c.json({
   name: 'APIMalaysia.my',
   description: 'APIMalaysia.my — Every API in Southeast Asia. Government open data + curated commercial APIs.',
   count: 0,
-  endpoints: ['/api/catalogue', '/api/search?q=', '/api/categories', '/api/countries', '/api/apis/:id'],
+  endpoints: ['/api/catalogue', '/api/search?q=', '/api/categories', '/api/countries', '/api/apis/:id', '/api/proxy?url='],
   mcp: '/mcp',
 }))
 

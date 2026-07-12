@@ -1,6 +1,8 @@
 import { db, sqlite } from './connection.ts'
 import { apis } from './schema.ts'
+import { eq } from 'drizzle-orm'
 import { ingest } from '../scripts/ingest.ts'
+import { generateDescription } from './descriptions.ts'
 
 sqlite.exec(`
   CREATE TABLE IF NOT EXISTS apis (
@@ -81,5 +83,24 @@ if (existing) {
 
 console.log('Database empty — ingesting from upstream catalogue...')
 await ingest()
+
+console.log('Generating descriptions for APIs missing them...')
+const nodesc = db.select({
+  id: apis.id, slug: apis.slug, title: apis.title,
+  description: apis.description, category: apis.category,
+  provider: apis.provider, auth: apis.auth, pricing: apis.pricing,
+  tier: apis.tier, countries: apis.countries,
+  baseUrl: apis.baseUrl, docs: apis.docs,
+}).from(apis).all()
+
+let descUpdated = 0
+for (const a of nodesc) {
+  if (a.description && a.description.length > 20) continue
+  const generated = generateDescription(a)
+  db.update(apis).set({ description: generated }).where(eq(apis.slug, a.slug)).run()
+  descUpdated++
+}
+console.log(`Generated descriptions for ${descUpdated} APIs`)
+
 console.log('Seed complete!')
 process.exit(0)

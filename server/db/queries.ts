@@ -45,7 +45,7 @@ export function searchApis(params: SearchParams) {
 
   const where = conditions.length > 0 ? and(...conditions) : undefined
 
-  const limit = Math.min(params.limit || 50, 200)
+  const limit = Math.min(params.limit || 200, 200)
   const offset = params.offset || 0
 
   return db.select().from(apis).where(where).limit(limit).offset(offset).all()

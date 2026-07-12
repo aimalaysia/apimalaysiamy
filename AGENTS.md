@@ -52,4 +52,7 @@ _Nothing currently staged_
 - `pnpm run dev:server` — Node watch (port 3001)  
 - `pnpm run build` — Full build (client + server)  
 - `pnpm run start` — Production start (compiled server)  
-- `pnpm run seed` — Run DB seeding/ingestion only
+- `pnpm run validate` — Run API validation/refresh  
+- `POST /api/admin/validate?all=true` — Generate missing descriptions  
+- `GET /api/proxy?url=...` — Server-side proxy for playground CORS bypass  
+- Default search limit: 200 (was 50), no default working/testable filters
