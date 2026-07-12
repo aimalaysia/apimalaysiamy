@@ -86,11 +86,11 @@ export function FilterBar() {
           No Auth
         </label>
 
-        <label className="flex items-center gap-1.5 text-sm text-zinc-300 cursor-pointer px-3 py-2 rounded-lg border border-emerald-700/50 bg-emerald-900/15 has-checked:bg-emerald-900/30 transition-colors whitespace-nowrap">
+        <label className="flex items-center gap-1.5 text-sm text-zinc-300 cursor-pointer px-3 py-2 rounded-lg border border-emerald-700/50 bg-emerald-900/15 transition-colors whitespace-nowrap has-checked:bg-emerald-900/30">
           <input
             type="checkbox"
-            checked={working !== 'false'}
-            onChange={e => setFilter('working', e.target.checked ? 'true' : 'false')}
+            checked={working === 'true'}
+            onChange={e => setFilter('working', e.target.checked ? 'true' : undefined)}
             className="rounded border-[#2e3460] bg-[#11152e] text-emerald-500 focus:ring-emerald-500/30 focus:ring-offset-0"
             aria-label="Show only verified working APIs"
           />
@@ -98,11 +98,11 @@ export function FilterBar() {
           Working
         </label>
 
-        <label className="flex items-center gap-1.5 text-sm text-zinc-300 cursor-pointer px-3 py-2 rounded-lg border border-amber-600/50 bg-amber-900/15 has-checked:bg-amber-900/30 transition-colors whitespace-nowrap">
+        <label className="flex items-center gap-1.5 text-sm text-zinc-300 cursor-pointer px-3 py-2 rounded-lg border border-amber-600/50 bg-amber-900/15 transition-colors whitespace-nowrap has-checked:bg-amber-900/30">
           <input
             type="checkbox"
-            checked={testable !== 'false'}
-            onChange={e => setFilter('testable', e.target.checked ? 'true' : 'false')}
+            checked={testable === 'true'}
+            onChange={e => setFilter('testable', e.target.checked ? 'true' : undefined)}
             className="rounded border-[#2e3460] bg-[#11152e] text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0"
             aria-label="Show only testable copyable APIs"
           />
