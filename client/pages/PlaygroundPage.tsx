@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { fetchApiById } from '../services/api.ts'
 import { useMeta } from '../hooks/useMeta.ts'
@@ -9,18 +9,27 @@ fetch('/api/apis/example')
   .then(data => console.log(data))
   .catch(console.error)`
 
+type ResponseTab = 'json' | 'preview' | 'raw'
+
 export function PlaygroundPage() {
   useMeta('API Playground', 'Test and experiment with Southeast Asian APIs directly in your browser. Send requests, view responses, and debug API integrations interactively.')
   const [searchParams] = useSearchParams()
   const apiId = searchParams.get('api')
 
   const [code, setCode] = useState(DEFAULT_CODE)
-  const [response, setResponse] = useState<string>('')
+  const [rawText, setRawText] = useState('')
+  const [contentType, setContentType] = useState('')
+  const [activeTab, setActiveTab] = useState<ResponseTab>('json')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  const isHtml = /html/i.test(contentType)
 
   const handleSelectApi = async () => {
     if (!apiId) return
     setLoading(true)
+    setError('')
     try {
       const api = await fetchApiById(apiId)
       const snippet = `// ${api.title}
@@ -29,9 +38,11 @@ const response = await fetch('${api.baseUrl || api.docs || api.sourceUrl || '/ap
 const data = await response.json();
 console.log(data);`
       setCode(snippet)
-      setResponse('')
+      setRawText('')
+      setContentType('')
+      setActiveTab('json')
     } catch {
-      setResponse('// Error loading API details')
+      setError('Error loading API details')
     }
     setLoading(false)
   }
@@ -42,7 +53,10 @@ console.log(data);`
 
   const handleRun = async () => {
     setLoading(true)
-    setResponse('// Running...')
+    setRawText('')
+    setContentType('')
+    setError('')
+    setActiveTab('json')
     try {
       const lines = code.split('\n')
       const rewritten = lines.map(line => {
@@ -61,19 +75,21 @@ console.log(data);`
         const url = fetchMatch[1]
         const res = await fetch(url)
         const text = await res.text()
-        try {
-          setResponse(JSON.stringify(JSON.parse(text), null, 2))
-        } catch {
-          setResponse(text)
-        }
+        setRawText(text)
+        setContentType(res.headers.get('Content-Type') || '')
+        if (isHtml) setActiveTab('preview')
       } else {
-        setResponse('// No fetch() call found in the code')
+        setError('No fetch() call found in the code')
       }
     } catch (err) {
-      setResponse(`// Error: ${err instanceof Error ? err.message : 'Unknown'}`)
+      setError(err instanceof Error ? err.message : 'Unknown error')
     }
     setLoading(false)
   }
+
+  const formattedJson = (() => {
+    try { return JSON.stringify(JSON.parse(rawText), null, 2) } catch { return '' }
+  })()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
@@ -127,11 +143,69 @@ console.log(data);`
           />
         </div>
 
-        <div className="flex-1 space-y-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Response</label>
-          <pre className="w-full h-[300px] sm:h-[400px] bg-[#080c1e] border border-[#1e2440] rounded-xl p-4 overflow-auto text-sm font-mono text-zinc-300">
-            <code>{response || '// Hit Run to see the response'}</code>
-          </pre>
+        <div className="flex-1 space-y-2 flex flex-col">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-1 bg-[#11152e] border border-[#1e2440] rounded-lg p-0.5">
+              {(['json', 'preview', 'raw'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-3 py-1 text-xs rounded-md font-medium transition-all duration-200 ${
+                    activeTab === tab
+                      ? 'bg-amber-500/20 text-amber-400'
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
+                >
+                  {tab === 'json' ? 'JSON' : tab === 'preview' ? 'Preview' : 'Raw'}
+                </button>
+              ))}
+            </div>
+            {contentType && (
+              <span className="text-[10px] text-zinc-600 truncate max-w-[200px] text-right">{contentType}</span>
+            )}
+          </div>
+
+          <div className="flex-1 min-h-[300px] sm:min-h-[400px] bg-[#080c1e] border border-[#1e2440] rounded-xl overflow-hidden">
+            {!rawText && !error && (
+              <div className="flex items-center justify-center h-[300px] sm:h-[400px] text-zinc-600 text-sm">
+                Hit Run to see the response
+              </div>
+            )}
+
+            {error && !rawText && (
+              <div className="p-4 text-sm font-mono text-rose-400 whitespace-pre-wrap break-words">
+                {error}
+              </div>
+            )}
+
+            {rawText && activeTab === 'json' && (
+              <pre className="w-full h-[300px] sm:h-[400px] p-4 overflow-auto text-sm font-mono text-zinc-300 whitespace-pre-wrap break-words m-0">
+                {formattedJson || rawText}
+              </pre>
+            )}
+
+            {rawText && activeTab === 'raw' && (
+              <pre className="w-full h-[300px] sm:h-[400px] p-4 overflow-auto text-sm font-mono text-zinc-300 whitespace-pre-wrap break-words m-0">
+                {rawText}
+              </pre>
+            )}
+
+            {rawText && activeTab === 'preview' && (
+              isHtml ? (
+                <iframe
+                  ref={iframeRef}
+                  srcDoc={rawText}
+                  className="w-full h-[300px] sm:h-[400px] border-0 bg-white"
+                  title="HTML Preview"
+                  sandbox="allow-same-origin"
+                />
+              ) : (
+                <pre className="w-full h-[300px] sm:h-[400px] p-4 overflow-auto text-sm font-mono text-zinc-300 whitespace-pre-wrap break-words m-0">
+                  {formattedJson || rawText}
+                </pre>
+              )
+            )}
+          </div>
         </div>
       </div>
 
@@ -157,7 +231,7 @@ console.log(data);`
           </li>
           <li className="flex items-start gap-2">
             <span className="text-amber-400/60 mt-0.5">•</span>
-            <span>Add <code className="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">?url=</code> to <code className="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">/api/proxy</code> or just write a regular <code className="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">fetch()</code> — it will be auto-proxied</span>
+            <span>HTML responses render live in the <strong>Preview</strong> tab; JSON auto-formats in the <strong>JSON</strong> tab</span>
           </li>
         </ul>
       </div>
