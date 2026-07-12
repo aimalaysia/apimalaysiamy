@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { searchApis, fetchCategories, fetchApiById, fetchCatalogue } from '../services/api'
+import { searchApis, fetchCategories, fetchApiById, fetchCatalogue, fetchCountries } from '../services/api'
 import type { SearchFilters } from '../types'
 
 export function useSearch(filters: SearchFilters) {

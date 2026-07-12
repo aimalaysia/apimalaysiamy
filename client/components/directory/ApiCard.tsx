@@ -105,6 +105,6 @@ export function ApiCard({ api, onSelect }: Props) {
           </span>
         ))}
       </div>
-    </div>
+    </article>
   )
 }

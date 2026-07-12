@@ -61,7 +61,7 @@ export const COUNTRY_NAMES: Record<string, string> = {
   LA: 'Laos', KH: 'Cambodia', TL: 'East Timor',
   AU: 'Australia', NZ: 'New Zealand', IN: 'India', CN: 'China',
   JP: 'Japan', KR: 'South Korea', US: 'United States', GB: 'United Kingdom',
-  DE: 'Germany', FR: 'France', NL: 'Netherlands', SG: 'Singapore',
+  DE: 'Germany', FR: 'France', NL: 'Netherlands',
   global: 'Global',
 }
 export const COUNTRIES = Object.keys(COUNTRY_NAMES).filter(c => c !== 'global').sort()
