@@ -1,15 +1,14 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { fetchApiById } from '../services/api.ts'
 import { useMeta } from '../hooks/useMeta.ts'
+import { ResponseViewer } from '../components/playground/ResponseViewer.tsx'
 
 const DEFAULT_CODE = `// Paste or select an API, then edit the request below
 fetch('/api/apis/example')
   .then(r => r.json())
   .then(data => console.log(data))
   .catch(console.error)`
-
-type ResponseTab = 'json' | 'preview' | 'raw'
 
 export function PlaygroundPage() {
   useMeta('API Playground', 'Test and experiment with Southeast Asian APIs directly in your browser. Send requests, view responses, and debug API integrations interactively.')
@@ -18,18 +17,28 @@ export function PlaygroundPage() {
 
   const [code, setCode] = useState(DEFAULT_CODE)
   const [rawText, setRawText] = useState('')
-  const [contentType, setContentType] = useState('')
-  const [activeTab, setActiveTab] = useState<ResponseTab>('json')
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [loading, setLoading] = useState(false)
+  const [meta, setMeta] = useState<{
+    status: number
+    statusText: string
+    contentType: string
+    responseTime: number
+    size: number
+    endpoint: string
+    method: string
+  } | null>(null)
 
-  const isHtml = /html/i.test(contentType)
+  const [splitPos, setSplitPos] = useState(50)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const dragging = useRef(false)
 
-  const handleSelectApi = async () => {
+  const handleSelectApi = useCallback(async () => {
     if (!apiId) return
     setLoading(true)
     setError('')
+    setRawText('')
+    setMeta(null)
     try {
       const api = await fetchApiById(apiId)
       const snippet = `// ${api.title}
@@ -38,25 +47,23 @@ const response = await fetch('${api.baseUrl || api.docs || api.sourceUrl || '/ap
 const data = await response.json();
 console.log(data);`
       setCode(snippet)
-      setRawText('')
-      setContentType('')
-      setActiveTab('json')
     } catch {
       setError('Error loading API details')
     }
     setLoading(false)
-  }
+  }, [apiId])
 
-  function proxyUrl(url: string): string {
+  const proxyUrl = useCallback((url: string) => {
     return `/api/proxy?url=${encodeURIComponent(url)}&_t=${Date.now()}`
-  }
+  }, [])
 
-  const handleRun = async () => {
+  const handleRun = useCallback(async () => {
     setLoading(true)
     setRawText('')
-    setContentType('')
     setError('')
-    setActiveTab('json')
+    setMeta(null)
+    const startTime = performance.now()
+
     try {
       const lines = code.split('\n')
       const rewritten = lines.map(line => {
@@ -71,25 +78,72 @@ console.log(data);`
       }).join('\n')
 
       const fetchMatch = rewritten.match(/fetch\s*\(\s*['"]([^'"]+)['"]/)
-      if (fetchMatch) {
-        const url = fetchMatch[1]
-        const res = await fetch(url)
-        const text = await res.text()
-        setRawText(text)
-        setContentType(res.headers.get('Content-Type') || '')
-        if (isHtml) setActiveTab('preview')
-      } else {
+      if (!fetchMatch) {
         setError('No fetch() call found in the code')
+        setLoading(false)
+        return
       }
+
+      const url = fetchMatch[1]
+      const methodMatch = rewritten.match(/method\s*:\s*['"]([^'"]+)['"]/)
+      const method = (methodMatch ? methodMatch[1].toUpperCase() : 'GET')
+
+      const res = await fetch(url, {
+        method,
+        signal: AbortSignal.timeout(30000),
+      })
+      const endTime = performance.now()
+      const text = await res.text()
+
+      setMeta({
+        status: res.status,
+        statusText: res.statusText || statusMessage(res.status),
+        contentType: res.headers.get('Content-Type') || 'text/plain',
+        responseTime: Math.round(endTime - startTime),
+        size: new Blob([text]).size,
+        endpoint: url.replace(/\/api\/proxy\?url=([^&]+).*/, (_, u) => decodeURIComponent(u)),
+        method,
+      })
+      setRawText(text)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      const endTime = performance.now()
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('Timeout after 30 seconds')
+      } else if (err instanceof TypeError && err.message.includes('fetch')) {
+        setError('Network error — the server may be unreachable')
+      } else {
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      }
+      setMeta(prev => prev ? { ...prev, responseTime: Math.round(performance.now() - startTime) } : null)
     }
     setLoading(false)
-  }
+  }, [code, proxyUrl])
 
-  const formattedJson = (() => {
-    try { return JSON.stringify(JSON.parse(rawText), null, 2) } catch { return '' }
-  })()
+  const handleMouseDown = useCallback(() => {
+    dragging.current = true
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [])
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragging.current || !containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      const pct = ((e.clientX - rect.left) / rect.width) * 100
+      setSplitPos(Math.max(25, Math.min(75, pct)))
+    }
+    const handleMouseUp = () => {
+      dragging.current = false
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
@@ -115,16 +169,16 @@ console.log(data);`
         </button>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center justify-between">
+      <div ref={containerRef} className="flex flex-col lg:flex-row gap-0 lg:gap-0 relative">
+        <div className="flex-1 flex flex-col lg:min-w-0" style={{ width: '100%' }}>
+          <div className="flex items-center justify-between mb-2">
             <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Request</label>
             <div className="flex gap-2">
               <button
-                onClick={() => setCode(DEFAULT_CODE)}
+                onClick={() => { setCode(DEFAULT_CODE); setRawText(''); setError(''); setMeta(null) }}
                 className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-2 py-1"
               >
-                Reset
+                Clear
               </button>
               <button
                 onClick={handleRun}
@@ -138,74 +192,23 @@ console.log(data);`
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full h-[300px] sm:h-[400px] bg-[#080c1e] border border-[#1e2440] rounded-xl p-4 text-sm font-mono text-zinc-300 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 resize-none transition-all duration-200"
+            className="w-full h-[250px] sm:h-[350px] bg-[#080c1e] border border-[#1e2440] rounded-xl p-4 text-sm font-mono text-zinc-300 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 resize-none transition-all duration-200 whitespace-pre-wrap break-words"
             spellCheck={false}
           />
         </div>
 
-        <div className="flex-1 space-y-2 flex flex-col">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-1 bg-[#11152e] border border-[#1e2440] rounded-lg p-0.5">
-              {(['json', 'preview', 'raw'] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-3 py-1 text-xs rounded-md font-medium transition-all duration-200 ${
-                    activeTab === tab
-                      ? 'bg-amber-500/20 text-amber-400'
-                      : 'text-zinc-500 hover:text-zinc-300'
-                  }`}
-                >
-                  {tab === 'json' ? 'JSON' : tab === 'preview' ? 'Preview' : 'Raw'}
-                </button>
-              ))}
-            </div>
-            {contentType && (
-              <span className="text-[10px] text-zinc-600 truncate max-w-[200px] text-right">{contentType}</span>
-            )}
-          </div>
+        <div className="hidden lg:flex items-center justify-center w-3 cursor-col-resize shrink-0 group" onMouseDown={handleMouseDown}>
+          <div className="w-0.5 h-8 rounded-full bg-zinc-700 group-hover:bg-amber-500/50 transition-colors" />
+        </div>
 
-          <div className="flex-1 min-h-[300px] sm:min-h-[400px] bg-[#080c1e] border border-[#1e2440] rounded-xl overflow-hidden">
-            {!rawText && !error && (
-              <div className="flex items-center justify-center h-[300px] sm:h-[400px] text-zinc-600 text-sm">
-                Hit Run to see the response
-              </div>
-            )}
-
-            {error && !rawText && (
-              <div className="p-4 text-sm font-mono text-rose-400 whitespace-pre-wrap break-words">
-                {error}
-              </div>
-            )}
-
-            {rawText && activeTab === 'json' && (
-              <pre className="w-full h-[300px] sm:h-[400px] p-4 overflow-auto text-sm font-mono text-zinc-300 whitespace-pre-wrap break-words m-0">
-                {formattedJson || rawText}
-              </pre>
-            )}
-
-            {rawText && activeTab === 'raw' && (
-              <pre className="w-full h-[300px] sm:h-[400px] p-4 overflow-auto text-sm font-mono text-zinc-300 whitespace-pre-wrap break-words m-0">
-                {rawText}
-              </pre>
-            )}
-
-            {rawText && activeTab === 'preview' && (
-              isHtml ? (
-                <iframe
-                  ref={iframeRef}
-                  srcDoc={rawText}
-                  className="w-full h-[300px] sm:h-[400px] border-0 bg-white"
-                  title="HTML Preview"
-                  sandbox="allow-same-origin"
-                />
-              ) : (
-                <pre className="w-full h-[300px] sm:h-[400px] p-4 overflow-auto text-sm font-mono text-zinc-300 whitespace-pre-wrap break-words m-0">
-                  {formattedJson || rawText}
-                </pre>
-              )
-            )}
-          </div>
+        <div className="flex-1 flex flex-col lg:min-w-0 mt-4 lg:mt-0">
+          <ResponseViewer
+            rawText={rawText}
+            meta={meta}
+            error={error}
+            onRun={handleRun}
+            loading={loading}
+          />
         </div>
       </div>
 
@@ -227,14 +230,22 @@ console.log(data);`
           </li>
           <li className="flex items-start gap-2">
             <span className="text-amber-400/60 mt-0.5">•</span>
-            <span>External URLs are automatically proxied through the server to avoid CORS issues</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-amber-400/60 mt-0.5">•</span>
-            <span>HTML responses render live in the <strong>Preview</strong> tab; JSON auto-formats in the <strong>JSON</strong> tab</span>
+            <span>External URLs are auto-proxied to avoid CORS; <strong>JSON</strong> tab has syntax-highlighted collapsible trees, <strong>Preview</strong> renders HTML live, <strong>Raw</strong> has search</span>
           </li>
         </ul>
       </div>
     </div>
   )
+}
+
+function statusMessage(code: number): string {
+  const m: Record<number, string> = {
+    200: 'OK', 201: 'Created', 204: 'No Content',
+    301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified',
+    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden',
+    404: 'Not Found', 405: 'Method Not Allowed', 408: 'Request Timeout',
+    429: 'Too Many Requests',
+    500: 'Internal Server Error', 502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout',
+  }
+  return m[code] || 'Unknown'
 }
