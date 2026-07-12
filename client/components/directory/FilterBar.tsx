@@ -18,6 +18,7 @@ export function FilterBar() {
           value={category || ''}
           onChange={e => setFilter('category', e.target.value || undefined)}
           className={selectClass}
+          aria-label="Filter by category"
         >
           <option value="">All Categories</option>
           {catData?.categories.map(c => (
@@ -29,6 +30,7 @@ export function FilterBar() {
           value={country || ''}
           onChange={e => setFilter('country', e.target.value || undefined)}
           className={selectClass}
+          aria-label="Filter by country"
         >
           <option value="">All Countries</option>
           {(countriesData?.countries ?? []).map(c => (
@@ -42,6 +44,7 @@ export function FilterBar() {
           value={auth || ''}
           onChange={e => setFilter('auth', e.target.value || undefined)}
           className={selectClass}
+          aria-label="Filter by authentication type"
         >
           <option value="">All Auth Types</option>
           {AUTH_TYPES.map(a => (
@@ -53,6 +56,7 @@ export function FilterBar() {
           value={pricing || ''}
           onChange={e => setFilter('pricing', e.target.value || undefined)}
           className={selectClass}
+          aria-label="Filter by pricing tier"
         >
           <option value="">All Pricing</option>
           {PRICING_TIERS.map(p => (
@@ -66,6 +70,7 @@ export function FilterBar() {
             checked={free === 'true'}
             onChange={e => setFilter('free', e.target.checked ? 'true' : undefined)}
             className="rounded border-[#2e3460] bg-[#11152e] text-emerald-500 focus:ring-emerald-500/30 focus:ring-offset-0"
+            aria-label="Filter free APIs only"
           />
           Free
         </label>
@@ -76,6 +81,7 @@ export function FilterBar() {
             checked={noAuth === 'true'}
             onChange={e => setFilter('noAuth', e.target.checked ? 'true' : undefined)}
             className="rounded border-[#2e3460] bg-[#11152e] text-sky-500 focus:ring-sky-500/30 focus:ring-offset-0"
+            aria-label="Filter no authentication APIs only"
           />
           No Auth
         </label>
@@ -86,6 +92,7 @@ export function FilterBar() {
             checked={working !== 'false'}
             onChange={e => setFilter('working', e.target.checked ? 'true' : 'false')}
             className="rounded border-[#2e3460] bg-[#11152e] text-emerald-500 focus:ring-emerald-500/30 focus:ring-offset-0"
+            aria-label="Show only verified working APIs"
           />
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           Working
@@ -97,6 +104,7 @@ export function FilterBar() {
             checked={testable !== 'false'}
             onChange={e => setFilter('testable', e.target.checked ? 'true' : 'false')}
             className="rounded border-[#2e3460] bg-[#11152e] text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0"
+            aria-label="Show only testable copyable APIs"
           />
           <svg className="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -109,6 +117,7 @@ export function FilterBar() {
           <button
             onClick={resetFilters}
             className="text-xs text-zinc-500 hover:text-amber-400 transition-colors ml-1 px-2 py-1"
+            aria-label="Clear all filters"
           >
             Clear all
           </button>

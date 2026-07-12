@@ -84,3 +84,9 @@ body {
 .flag-container {
   animation: flag-glow 3s ease-in-out infinite;
 }
+
+*:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+  border-radius: 4px;
+}

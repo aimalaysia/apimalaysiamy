@@ -29,9 +29,13 @@ export function ApiCard({ api, onSelect }: Props) {
   const isTestable = api.copyable === true || api.copyable === 1
 
   return (
-    <div
+    <article
       onClick={() => onSelect(api)}
       className="group relative bg-[#11152e] border border-[#1e2440] rounded-xl p-4 sm:p-5 cursor-pointer hover:border-amber-500/40 hover:bg-[#1a1f3a] transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/5"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(api) } }}
+      aria-label={`View details for ${api.title}`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 min-w-0">

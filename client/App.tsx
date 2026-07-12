@@ -15,6 +15,7 @@ export default function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<DirectoryPage />} />
+            <Route path="/api/:slug" element={<DirectoryPage />} />
             <Route path="/playground" element={<PlaygroundPage />} />
             <Route path="/submit" element={<SubmitPage />} />
           </Routes>

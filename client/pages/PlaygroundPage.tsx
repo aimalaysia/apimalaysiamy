@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { fetchApiById } from '../services/api.ts'
+import { useMeta } from '../hooks/useMeta.ts'
 
 const DEFAULT_CODE = `// Paste or select an API, then edit the request below
 fetch('/api/apis/example')
@@ -9,6 +10,7 @@ fetch('/api/apis/example')
   .catch(console.error)`
 
 export function PlaygroundPage() {
+  useMeta('API Playground', 'Test and experiment with Southeast Asian APIs directly in your browser. Send requests, view responses, and debug API integrations interactively.')
   const [searchParams] = useSearchParams()
   const apiId = searchParams.get('api')
 

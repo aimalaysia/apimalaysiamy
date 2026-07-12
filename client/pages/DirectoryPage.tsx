@@ -1,14 +1,38 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import type { ApiEntry } from '../types/index.ts'
+import { fetchApiById } from '../services/api.ts'
+import { useMeta } from '../hooks/useMeta.ts'
 import { ApiCardGrid } from '../components/directory/ApiCardGrid.tsx'
 import { DetailPanel } from '../components/detail/DetailPanel.tsx'
 
 export function DirectoryPage() {
+  const { slug } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
   const [selected, setSelected] = useState<ApiEntry | null>(null)
+
+  const metaTitle = selected
+    ? `${selected.title} — MyAPI`
+    : undefined
+  const metaDesc = selected
+    ? `Explore the ${selected.title} API by ${selected.provider}. ${selected.auth === 'none' ? 'No authentication required. ' : `${selected.auth} authentication. `}${selected.pricing === 'free' ? 'Free to use.' : `${selected.pricing} pricing.`}`
+    : 'Browse 1,400+ APIs from Malaysia, Singapore, Indonesia, Thailand, and Southeast Asia. Filter by category, country, authentication, pricing, and more.'
+  useMeta(metaTitle, metaDesc)
+
+  useEffect(() => {
+    if (!slug) { setSelected(null); return }
+    fetchApiById(slug).then(setSelected).catch(() => {})
+  }, [slug])
 
   const handleSelect = useCallback((api: ApiEntry) => {
     setSelected(api)
+    window.history.replaceState(null, '', `/api/${api.slug}`)
   }, [])
+
+  const handleCloseDetail = useCallback(() => {
+    setSelected(null)
+    navigate('/', { replace: true })
+  }, [navigate])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
@@ -29,7 +53,7 @@ export function DirectoryPage() {
       </div>
       <ApiCardGrid onSelect={handleSelect} />
       {selected && (
-        <DetailPanel api={selected} onClose={() => setSelected(null)} />
+        <DetailPanel api={selected} onClose={handleCloseDetail} />
       )}
     </div>
   )

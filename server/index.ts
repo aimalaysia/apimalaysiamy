@@ -8,6 +8,7 @@ import { categoriesRoute } from './routes/categories.ts'
 import { apisRoute } from './routes/apis.ts'
 import { submitRoute } from './routes/submit.ts'
 import { countriesRoute } from './routes/countries.ts'
+import { seoRoute } from './routes/seo.ts'
 
 const app = new Hono()
 
@@ -40,6 +41,8 @@ app.get('/mcp', (c) => c.json({
 }))
 
 app.get('/health', (c) => c.json({ status: 'ok' }))
+
+app.route('/', seoRoute)
 
 app.get('/*', serveStatic({ path: '../client/dist/index.html' }))
 
