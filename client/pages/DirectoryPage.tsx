@@ -43,7 +43,7 @@ export function DirectoryPage() {
           </span>
           <div>
             <h1 className="text-2xl sm:text-3xl font-heading font-bold text-white tracking-tight">
-              API<span className="text-amber-400">Malaysia</span><span className="text-zinc-500 text-xl sm:text-2xl font-normal">.my</span> Directory
+              API<span className="text-amber-400">Malaysia</span> Directory
             </h1>
           </div>
         </div>
