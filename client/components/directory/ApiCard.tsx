@@ -21,10 +21,20 @@ interface Props {
   onSelect: (api: ApiEntry) => void
 }
 
+function parseCountries(raw: string | null | undefined): string[] {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 export function ApiCard({ api, onSelect }: Props) {
   const { toggle, isFavorite } = useFavoritesStore()
   const fav = isFavorite(api.id)
-  const countries: string[] = JSON.parse(api.countries || '[]')
+  const countries = parseCountries(api.countries)
   const isWorking = !!api.verifiedAt
   const isTestable = api.copyable === true || api.copyable === 1
 

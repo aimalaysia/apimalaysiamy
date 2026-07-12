@@ -16,8 +16,18 @@ interface Props {
   onClose: () => void
 }
 
+function parseCountries(raw: string | null | undefined): string[] {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 export function DetailPanel({ api, onClose }: Props) {
-  const countries: string[] = JSON.parse(api.countries || '[]')
+  const countries = parseCountries(api.countries)
   const { toggle, isFavorite } = useFavoritesStore()
   const fav = isFavorite(api.id)
   const isWorking = !!api.verifiedAt
