@@ -51,7 +51,7 @@ export function JsonTree({ data, initialCollapsed = false, depth = 0, keyName, s
     }
 
     return (
-      <span>
+      <>
         <span className="inline-flex items-center gap-1 cursor-pointer hover:opacity-80" onClick={toggle}>
           <span className="text-zinc-500">[</span>
           <span className="text-zinc-600 text-xs ml-1">{prefix}</span>
@@ -77,7 +77,7 @@ export function JsonTree({ data, initialCollapsed = false, depth = 0, keyName, s
         <span className="cursor-pointer hover:opacity-80" onClick={toggle}>
           <span className="text-zinc-500">]</span>
         </span>
-      </span>
+      </>
     )
   }
 
@@ -99,7 +99,7 @@ export function JsonTree({ data, initialCollapsed = false, depth = 0, keyName, s
     }
 
     return (
-      <span>
+      <>
         <span className="inline-flex items-center gap-1 cursor-pointer hover:opacity-80" onClick={toggle}>
           <span className="text-zinc-500">{'{'}</span>
           <span className="text-zinc-600 text-xs ml-1">{prefix}</span>
@@ -116,7 +116,7 @@ export function JsonTree({ data, initialCollapsed = false, depth = 0, keyName, s
         <span className="cursor-pointer hover:opacity-80" onClick={toggle}>
           <span className="text-zinc-500">{'}'}</span>
         </span>
-      </span>
+      </>
     )
   }
 
