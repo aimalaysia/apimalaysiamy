@@ -12,7 +12,7 @@ export function DirectoryPage() {
   const [selected, setSelected] = useState<ApiEntry | null>(null)
 
   const metaTitle = selected
-    ? `${selected.title} — MyAPI`
+    ? `${selected.title} — APIMalaysia.my`
     : undefined
   const metaDesc = selected
     ? `Explore the ${selected.title} API by ${selected.provider}. ${selected.auth === 'none' ? 'No authentication required. ' : `${selected.auth} authentication. `}${selected.pricing === 'free' ? 'Free to use.' : `${selected.pricing} pricing.`}`
@@ -38,12 +38,12 @@ export function DirectoryPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
       <div className="mb-8 sm:mb-10">
         <div className="flex items-center gap-3 mb-3">
-          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-black text-lg font-bold shadow-lg shadow-amber-500/20">
-            M
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-black text-base font-bold shadow-lg shadow-amber-500/20">
+            AM
           </span>
           <div>
             <h1 className="text-2xl sm:text-3xl font-heading font-bold text-white tracking-tight">
-              My<span className="text-amber-400">API</span> Directory
+              API<span className="text-amber-400">Malaysia</span><span className="text-zinc-500 text-xl sm:text-2xl font-normal">.my</span> Directory
             </h1>
           </div>
         </div>

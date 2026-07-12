@@ -49,10 +49,10 @@ seoRoute.get('/api/:slug', (c) => {
   const api = getApiBySlug(slug)
   if (!api) return c.redirect('/')
 
-  const title = `${api.title} — MyAPI | Southeast Asia API Directory`
+  const title = `${api.title} — APIMalaysia.my | Southeast Asia API Directory`
   const description = api.description
     ? api.description.slice(0, 160)
-    : `Explore the ${api.title} API by ${api.provider}. ${api.auth === 'none' ? 'No authentication required. ' : `${api.auth} authentication. `}${api.pricing === 'free' ? 'Free to use. ' : `${api.pricing} pricing. `}Part of the MyAPI directory of Southeast Asian APIs.`
+    : `Explore the ${api.title} API by ${api.provider}. ${api.auth === 'none' ? 'No authentication required. ' : `${api.auth} authentication. `}${api.pricing === 'free' ? 'Free to use. ' : `${api.pricing} pricing. `}Part of the APIMalaysia.my directory of Southeast Asian APIs.`
 
   let countries: string[] = []
   try { countries = JSON.parse(api.countries) } catch {}

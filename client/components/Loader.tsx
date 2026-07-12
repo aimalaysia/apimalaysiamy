@@ -30,7 +30,7 @@ export default function Loader() {
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffcc00] to-transparent animate-pulse" />
       </div>
       <h1 className="font-heading text-3xl font-bold text-white tracking-wide mb-2">
-        MyAPI
+        APIMalaysia.my
       </h1>
       <p className="text-[#8b8fa3] text-sm font-sans animate-pulse">
         Memuatkan...

@@ -3,7 +3,7 @@
 A fast-moving project — always read this before making changes.
 
 ## Project
-- `D:\myapi` — API Directory for Southeast Asia (MyAPI / apimalaysiamy)  
+- `D:\myapi` — API Directory for Southeast Asia (APIMalaysia.my / apimalaysiamy)  
 - Tech: Vite + React + TypeScript client, Express + better-sqlite3 + Drizzle ORM server  
 - Hosted on Render (Free) at `https://apimalaysiamy.onrender.com`  
 - Custom domain: `apimalaysia.my` (not yet active)  

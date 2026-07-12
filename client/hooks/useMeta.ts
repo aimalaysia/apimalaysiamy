@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const BASE_TITLE = 'MyAPI — API Directory for Southeast Asia'
+const BASE_TITLE = 'APIMalaysia.my — API Directory for Southeast Asia'
 const BASE_DESC = 'Discover, explore, and test 1,400+ APIs from across Southeast Asia. Curated directory of government open data and commercial APIs.'
 
 function setMeta(name: string, content: string) {

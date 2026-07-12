@@ -3,7 +3,7 @@ import { submitApi } from '../services/api.ts'
 import { useMeta } from '../hooks/useMeta.ts'
 
 export function SubmitPage() {
-  useMeta('Submit an API', 'Contribute to the MyAPI directory by submitting a new Southeast Asian API for review. Fill in the details and our team will verify and add it.')
+  useMeta('Submit an API', 'Contribute to the APIMalaysia.my directory by submitting a new Southeast Asian API for review. Fill in the details and our team will verify and add it.')
   const [form, setForm] = useState({
     title: '', category: '', provider: '', tier: 'community',
     kind: 'api', auth: 'none', pricing: 'free', docs: '', baseUrl: '',

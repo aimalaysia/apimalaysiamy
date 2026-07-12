@@ -1,8 +1,8 @@
-# MyAPI — API Directory for Southeast Asia
+# APIMalaysia.my — API Directory for Southeast Asia
 
 **Discover, explore, and test APIs from across Southeast Asia.**
 
-MyAPI is a curated, open-source directory of APIs from Malaysia, Singapore, Indonesia, Thailand, Vietnam, the Philippines, and the broader SEA region. It indexes government open-data portals, commercial API providers, and public datasets — making it easy for developers to find, evaluate, and integrate regional APIs.
+APIMalaysia.my is a curated, open-source directory of APIs from Malaysia, Singapore, Indonesia, Thailand, Vietnam, the Philippines, and the broader SEA region. It indexes government open-data portals, commercial API providers, and public datasets — making it easy for developers to find, evaluate, and integrate regional APIs.
 
 > **Purpose**: Educational and learning use only. Helps developers understand, evaluate, and prototype with APIs from the Southeast Asian ecosystem.
 
@@ -49,7 +49,7 @@ PasarAPI (catalogue) ──> ingest.ts ──> SQLite DB ──> Hono API ──
                                    Community submissions
 ```
 
-The ingestion pipeline (`server/scripts/ingest.ts`) fetches the PasarAPI catalogue, transforms entries to match the MyAPI schema, deduplicates by slug, and upserts into the local SQLite database. Categories are built dynamically from the data.
+The ingestion pipeline (`server/scripts/ingest.ts`) fetches the PasarAPI catalogue, transforms entries to match the APIMalaysia.my schema, deduplicates by slug, and upserts into the local SQLite database. Categories are built dynamically from the data.
 
 ### Categorisation System
 
@@ -370,7 +370,7 @@ APIs from official government open-data portals are automatically marked as Work
 
 ### Can I use these APIs in production?
 
-Many of the listed APIs are production-ready services from official providers. However, always check each API's terms of service, rate limits, and licensing before using in production. MyAPI is for educational discovery — you must verify terms independently.
+Many of the listed APIs are production-ready services from official providers. However, always check each API's terms of service, rate limits, and licensing before using in production. APIMalaysia.my is for educational discovery — you must verify terms independently.
 
 ### How often is the catalogue updated?
 
@@ -384,9 +384,9 @@ APIs marked with `copyable: false` either require production-grade setup, need a
 
 Open a GitHub issue or use the Submit page with a correction note. Include the API slug and what's broken.
 
-### Is there rate limiting on the MyAPI service?
+### Is there rate limiting on the APIMalaysia.my service?
 
-The MyAPI server itself has no rate limiting on its search endpoints, but individual APIs listed in the directory may have their own rate limits.
+The APIMalaysia.my server itself has no rate limiting on its search endpoints, but individual APIs listed in the directory may have their own rate limits.
 
 ---
 

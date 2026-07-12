@@ -25,8 +25,8 @@ app.route('/api', submitRoute)
 app.route('/api/countries', countriesRoute)
 
 app.get('/api', (c) => c.json({
-  name: 'MyAPI',
-  description: 'MyAPI — Every API in Southeast Asia. Government open data + curated commercial APIs.',
+  name: 'APIMalaysia.my',
+  description: 'APIMalaysia.my — Every API in Southeast Asia. Government open data + curated commercial APIs.',
   count: 0,
   endpoints: ['/api/catalogue', '/api/search?q=', '/api/categories', '/api/countries', '/api/apis/:id'],
   mcp: '/mcp',
